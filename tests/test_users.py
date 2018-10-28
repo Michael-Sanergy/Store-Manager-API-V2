@@ -24,8 +24,8 @@ class UserTestCase(unittest.TestCase):
         self.users = {
             "name": "John Doe",
             "email": "johndoe@gmail.com",
-            "phone": "0722123456",
-            "role": "John Doe",
+            "phone": "722123456",
+            "is_admin": False,
             "password": "12345"}
 
     def tearDown(self):
@@ -39,7 +39,7 @@ class UserTestCase(unittest.TestCase):
         """Test admin can add a user"""
 
         response = self.client.post(
-            "/api/v1/auth/signup",
+            "/api/v2/auth/signup",
             data=json.dumps(
                 self.users),
             content_type=self.content_type)
