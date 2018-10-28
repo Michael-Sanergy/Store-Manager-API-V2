@@ -8,7 +8,6 @@ class UserModel:
     """Model for users"""
 
     def __init__(self, name, email, phone, password):
-        #self.db = init_db()
         self.name = name
         self.email = email
         self.phone = phone
