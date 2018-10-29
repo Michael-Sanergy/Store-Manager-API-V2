@@ -27,10 +27,6 @@ class UserModel:
         # Commit changes to database
         db.commit()
 
-    def validate_password(self, password):
-        """check if the hashed password is the same as the password entered by the user"""
-        return Bcrypt().check_password_hash(self.password, password)
-
     @classmethod
     def get_a_user_by_email(cls, email):
         """Search for a user by their email address"""
