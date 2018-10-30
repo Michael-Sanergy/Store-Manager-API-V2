@@ -13,7 +13,7 @@ env:
 
 before_script:
   - export FLASK_ENV='testing'
-  - export DATABASE_URL='test_db'
+  - export DATABASE_URL='postgresql://postgres:12345@localhost:5432/test_db'
   - psql -c 'create database test_db;' -U postgres
   
 install:
