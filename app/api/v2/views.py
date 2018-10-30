@@ -3,10 +3,11 @@ from flask_restplus import Resource, Namespace, fields
 from flask_bcrypt import Bcrypt
 
 # Local imports
-from .models import UserModel
+from .models import UserModel, ProductModel
 
 namespace_1 = Namespace("auth/signup", description="End point for signup")
 namespace_2 = Namespace("auth/login", description="End point for login")
+namespace_3 = Namespace("products", description="End points for products")
 
 user = namespace_1.model('User Registration', {
     'name': fields.String(required=True, description="Your name"),
@@ -20,6 +21,15 @@ user_login = namespace_2.model('User Login', {
     'email': fields.String(required=True, description="Your email"),
     'password': fields.String(required=True, description="Your password")
 })
+
+product = namespace_3.model(
+    'Products', {
+        "name": fields.String(
+            required=True, description="Product name"), "category": fields.String(
+                required=True, description="Product category"), "quantity": fields.Integer(
+                    required=True, description="Quantity"), "minimum_inventory_quantity": fields.Integer(
+                        required=True, description="Mininum Inventory Quantity"), "price": fields.Integer(
+                            required=True, description="Price")})
 
 
 @namespace_1.route('/')
@@ -51,7 +61,6 @@ class Signup(Resource):
 
             # Sign up the user
             user.signup_user()
-            # UserModel.registered_users.append(signup_user)
             return {"message": "Sign up was successful"}, 201
 
 
@@ -79,3 +88,36 @@ class Login(Resource):
             return {"message": "Login Failed!"}, 401
         elif not user_record:
             return {"message": "You are not registered!. Please register"}, 403
+
+
+@namespace_3.route('/')
+class ProductView(Resource):
+    """Products resource"""
+
+    @namespace_3.expect(product)
+    def post(self):
+        """Add a product"""
+
+        data = request.get_json(force=True)
+
+        # search the product by id
+        product_record = ProductModel.get_a_product_by_id(data['name'])
+
+        # check if the product already exists
+        if product_record:
+            return {
+                "message": "Product {} already exists.".format(
+                    data['name'])}, 202
+
+        # create a product if it doesn't exist
+        if not product_record:
+            product = ProductModel(
+                data['name'],
+                data['category'],
+                data['quantity'],
+                data['minimum_inventory_quantity'],
+                data['price'])
+
+            # Create the product
+            product.create_product()
+            return{"message": "Product has been added"}, 201
