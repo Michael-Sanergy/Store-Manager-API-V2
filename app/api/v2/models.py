@@ -39,3 +39,48 @@ class UserModel:
         # Get a single user
         user = curr.fetchone()
         return user
+
+
+class ProductModel:
+    """Model for products"""
+
+    def __init__(
+            self,
+            name,
+            category,
+            quantity,
+            minimum_inventory_quantity,
+            price):
+        """Initialize class constructor with product details"""
+
+        self.name = name
+        self.category = category
+        self.quantity = quantity
+        self.minimum_inventory_quantity = minimum_inventory_quantity
+        self.price = price
+
+    def create_product(self):
+        """Create a product"""
+
+        query = """INSERT INTO products (name,category,quantity,minimum_inventory_quantity,price) VALUES
+        ('%s', '%s', '%s', '%s', '%s')""" % (self.name, self.category, self.quantity,
+                                             self.minimum_inventory_quantity, self.price)
+
+        # Execute the query
+        curr.execute(query)
+
+        # Commit changes to database
+        db.commit()
+
+    @classmethod
+    def get_a_product_by_id(cls, name):
+        """Search for a product by name"""
+
+        query = "SELECT * FROM products WHERE name='{}';".format(name)
+
+        # Execute the query
+        curr.execute(query)
+
+        # Get a single user
+        product = curr.fetchone()
+        return product
