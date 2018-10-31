@@ -7,19 +7,19 @@ from .database import db, curr
 class UserModel:
     """Model for users"""
 
-    def __init__(self, name, email, phone, password):
+    def __init__(self, name, email, phone, role, password):
         self.name = name
         self.email = email
         self.phone = phone
-        self.is_admin = False
+        self.role = role
         self.password = Bcrypt().generate_password_hash(password).decode('utf-8')
 
     def signup_user(self):
         """Sign up users"""
 
-        query = """INSERT INTO users (name,email,phone,is_admin,password) VALUES
+        query = """INSERT INTO users (name,email,phone,role,password) VALUES
         ('%s', '%s', '%s', '%s', '%s')""" % (
-            self.name, self.email, self.phone, self.is_admin, self.password)
+            self.name, self.email, self.phone, self.role, self.password)
 
         # Execute the query
         curr.execute(query)
@@ -73,7 +73,7 @@ class ProductModel:
         db.commit()
 
     @classmethod
-    def get_a_product_by_id(cls, name):
+    def get_a_product_by_name(cls, name):
         """Search for a product by name"""
 
         query = "SELECT * FROM products WHERE name='{}';".format(name)

@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_jwt_extended import JWTManager
 
 # Local import
 from instance.config import app_config
@@ -9,6 +10,7 @@ def create_app(config_name):
     """Create an instance of Flask and load with environment variables"""
 
     app = Flask(__name__, instance_relative_config=True)
+    JWTManager(app)
 
     # Create database tables
     create_tables()
