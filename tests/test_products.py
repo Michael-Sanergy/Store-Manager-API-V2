@@ -14,10 +14,21 @@ class UserTestCase(unittest.TestCase):
 
         self.app = create_app(config_name="testing")
         self.client = self.app.test_client()
-        self.content_type = "application/json"
+        self.header_content = {"content_type": "application/json"}
 
         # Create all tables
         create_tables()
+
+        self.admin_user = {
+            "name": "John Doe",
+            "email": "johndoe@gmail.com",
+            "phone": "7262123",
+            "role": "admin",
+            "password": "12345"}
+
+        self.admin_login = {
+            "email": "johndoe@gmail.com",
+            "password": "12345"}
 
         self.product = {
             'name': 'Popcorn',
@@ -26,21 +37,42 @@ class UserTestCase(unittest.TestCase):
             "minimum_inventory_quantity": 5,
             'price': 20}
 
+        # Sign up admin user
+        response = self.client.post(
+            "/api/v2/auth/signup",
+            data=json.dumps(
+                self.admin_user),
+            headers=self.header_content)
+
+        # Login admin user
+        response = self.client.post(
+            "/api/v2/auth/login",
+            data=json.dumps(
+                self.admin_login),
+            headers=self.header_content)
+        result = json.loads(response.data.decode())
+        # Get access token
+        token = result['access_token']
+        self.authorize_user = {"content_type": "application/json"}
+        self.authorize_user["Authorization"] = 'Bearer ' + token
+
     def tearDown(self):
         """Empty the product dictionary after running every test"""
 
+        self.admin_user = {}
+        self.admin_login = {}
         self.product = {}
         # Delete all tables
         delete_tables()
 
     def test_add_a_product(self):
-        """Test that a product can be added"""
 
         response = self.client.post(
             '/api/v2/products',
             data=json.dumps(
                 self.product),
-            content_type=self.content_type)
+            headers=self.authorize_user)
+        print(response.data)
         data = json.loads(response.get_data().decode('UTF-8'))
         self.assertEqual(response.status_code, 201)
         self.assertEqual(data, {"message": "Product has been added"})
@@ -49,19 +81,20 @@ class UserTestCase(unittest.TestCase):
         """Test same product can't be added again"""
 
         response1 = self.client.post(
-            "/api/v2/products",
+            '/api/v2/products',
             data=json.dumps(
                 self.product),
-            content_type=self.content_type)
+            headers=self.authorize_user)
+
         data = json.loads(response1.get_data().decode('UTF-8'))
         self.assertEqual(response1.status_code, 201)
         self.assertEqual(data, {"message": "Product has been added"})
 
         response2 = self.client.post(
-            "/api/v2/products",
+            '/api/v2/products',
             data=json.dumps(
                 self.product),
-            content_type=self.content_type)
+            headers=self.authorize_user)
         data = json.loads(response2.get_data().decode('UTF-8'))
         self.assertEqual(response2.status_code, 202)
         self.assertEqual(data, {"message": "Product Popcorn already exists."})
