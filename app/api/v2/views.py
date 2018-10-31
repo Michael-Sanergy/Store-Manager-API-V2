@@ -1,6 +1,7 @@
 from flask import request
 from flask_restplus import Resource, Namespace, fields
 from flask_bcrypt import Bcrypt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 # Local imports
 from .models import UserModel, ProductModel
@@ -13,7 +14,7 @@ user = namespace_1.model('User Registration', {
     'name': fields.String(required=True, description="Your name"),
     'email': fields.String(required=True, description="Your email"),
     'phone': fields.Integer(required=True, description="Phone number"),
-    'is_admin': fields.Boolean(description="Has admin role"),
+    'role': fields.String(required=True, description="Enter 'admin' or 'attendant' role"),
     'password': fields.String(required=True, description="Enter password")
 })
 
@@ -57,6 +58,7 @@ class Signup(Resource):
                 data['name'],
                 data['email'],
                 data['phone'],
+                data['role'],
                 data['password'])
 
             # Sign up the user
@@ -84,7 +86,11 @@ class Login(Resource):
                 user_record[5], data['password'])
             # Check if the login credentials are valid
             if user_record[2] == data['email'] and validate_password:
-                return {"message": "Login Successful"}, 201
+                # Create access token
+                access_token = create_access_token(identity=data['email'])
+
+                return {"message": "Login Successful",
+                        "access_token": access_token}, 201
             return {"message": "Login Failed!"}, 401
         elif not user_record:
             return {"message": "You are not registered!. Please register"}, 403
@@ -94,9 +100,20 @@ class Login(Resource):
 class ProductView(Resource):
     """Products resource"""
 
+    @jwt_required
     @namespace_3.expect(product)
     def post(self):
         """Add a product"""
+
+        # Get email identity used from the access token
+        user_email = get_jwt_identity()
+        # search the user by email
+        logged_in_user = UserModel.get_a_user_by_email(user_email)
+        role = logged_in_user[4]
+
+        # Check if user is an admin
+        if role != 'admin':
+            return {"message": "Permission denied! You are not an admin."}, 403
 
         data = request.get_json(force=True)
 
