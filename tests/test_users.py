@@ -23,7 +23,7 @@ class UserTestCase(unittest.TestCase):
             "name": "John Doe",
             "email": "johndoe@gmail.com",
             "phone": "722123456",
-            "is_admin": False,
+            "role": "admin",
             "password": "12345"}
 
         self.user_login = {
@@ -87,7 +87,7 @@ class UserTestCase(unittest.TestCase):
             content_type=self.content_type)
         data = json.loads(response.get_data().decode('UTF-8'))
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(data, {"message": "Login Successful"})
+        self.assertEqual(data["message"], "Login Successful")
 
     def test_registered_user_cant_login_with_wrong_password(self):
         """Test user can't login with wrong password"""
