@@ -118,7 +118,7 @@ class ProductView(Resource):
         data = request.get_json(force=True)
 
         # search the product by id
-        product_record = ProductModel.get_a_product_by_id(data['name'])
+        product_record = ProductModel.get_a_product_by_name(data['name'])
 
         # check if the product already exists
         if product_record:
