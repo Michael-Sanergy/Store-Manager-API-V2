@@ -72,7 +72,6 @@ class UserTestCase(unittest.TestCase):
             data=json.dumps(
                 self.product),
             headers=self.authorize_user)
-        print(response.data)
         data = json.loads(response.get_data().decode('UTF-8'))
         self.assertEqual(response.status_code, 201)
         self.assertEqual(data, {"message": "Product has been added"})
@@ -98,3 +97,13 @@ class UserTestCase(unittest.TestCase):
         data = json.loads(response2.get_data().decode('UTF-8'))
         self.assertEqual(response2.status_code, 202)
         self.assertEqual(data, {"message": "Product Popcorn already exists."})
+
+    def test_get_all_products(self):
+        """Test getting all products"""
+
+        response = self.client.get(
+            "/api/v2/products",
+            headers=self.authorize_user)
+        data = json.loads(response.get_data().decode('UTF-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data, {"message": "Product(s) Found", "data": []})
