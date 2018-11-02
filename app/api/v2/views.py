@@ -150,3 +150,23 @@ class ProductView(Resource):
         for p in products:
             products_list.append(ProductModel.get_product_details(self, p))
         return {"message": "Product(s) Found", "data": products_list}, 200
+
+
+@namespace_3.route('/<int:id>')
+class Product(Resource):
+
+    @jwt_required
+    def get(self, id):
+        """Get a product by id"""
+
+        products_list = []
+
+        # search the product by id
+        product = ProductModel.get_a_product_by_id(self, id)
+
+        # Check if product doesn't exist
+        if product is None:
+            return {"Message": "Product not found"}, 404
+
+        products_list.append(ProductModel.get_product_details(self, product))
+        return {"message": "Product Found", "data": products_list}, 200
