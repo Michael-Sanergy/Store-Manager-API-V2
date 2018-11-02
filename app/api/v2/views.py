@@ -320,3 +320,22 @@ class SaleView(Resource):
         for s in sales:
             sales_list.append(SaleModel.get_sale_details(self, s))
         return {"message": "Sale(s) Found", "data": sales_list}, 200
+
+@namespace_4.route('/<int:id>')
+class Sale(Resource):
+
+    @jwt_required
+    def get(self, id):
+        """Get a sale by id"""
+
+        sales_list = []
+
+        # search the sale by id
+        sale = SaleModel.get_a_sale_by_id(self, id)
+
+        # Check if sale doesn't exist
+        if sale is None:
+            return {"Message": "Sale not found"}, 404
+
+        sales_list.append(SaleModel.get_sale_details(self, sale))
+        return {"message": "Sale Found", "data": sales_list}, 200
