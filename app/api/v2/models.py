@@ -44,20 +44,16 @@ class UserModel:
 class ProductModel:
     """Model for products"""
 
-    def __init__(
-            self,
-            name,
-            category,
-            quantity,
-            minimum_inventory_quantity,
-            price):
+    products_list = []
+
+    def __init__(self, data):
         """Initialize class constructor with product details"""
 
-        self.name = name
-        self.category = category
-        self.quantity = quantity
-        self.minimum_inventory_quantity = minimum_inventory_quantity
-        self.price = price
+        self.name = data['name']
+        self.category = data['category']
+        self.quantity = data['quantity']
+        self.minimum_inventory_quantity = data['minimum_inventory_quantity']
+        self.price = data['price']
 
     def create_product(self):
         """Create a product"""
@@ -72,6 +68,28 @@ class ProductModel:
         # Commit changes to database
         db.commit()
 
+    def get_all_products(self):
+        """Get all products"""
+
+        query = "SELECT * FROM products"
+
+        # Execute the query
+        curr.execute(query)
+
+        products_list = curr.fetchall()
+        return products_list
+
+    def get_product_details(self, product):
+        """Return the product as a dictionary"""
+
+        return dict(
+            id=product[0],
+            name=product[1],
+            category=product[2],
+            quantity=product[3],
+            minimum_inventory_quantity=product[4],
+            price=product[5])
+
     @classmethod
     def get_a_product_by_name(cls, name):
         """Search for a product by name"""
@@ -81,6 +99,6 @@ class ProductModel:
         # Execute the query
         curr.execute(query)
 
-        # Get a single user
+        # Get a single product
         product = curr.fetchone()
         return product

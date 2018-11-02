@@ -48,7 +48,7 @@ def tables():
             id serial PRIMARY KEY NOT NULL,
             name VARCHAR(100) NOT NULL,
             email VARCHAR(80) UNIQUE NOT NULL,
-            phone numeric(30) UNIQUE NOT NULL,
+            phone INTEGER UNIQUE NOT NULL,
             role VARCHAR(20) NOT NULL,
             password TEXT NOT NULL
     )"""
@@ -57,19 +57,17 @@ def tables():
             id serial PRIMARY KEY NOT NULL,
             name VARCHAR(150) UNIQUE NOT NULL,
             category VARCHAR(80) NOT NULL,
-            quantity numeric(4) NOT NULL,
-            minimum_inventory_quantity numeric(4) NOT NULL,
-            price numeric(6) NOT NULL
+            quantity INTEGER NOT NULL,
+            minimum_inventory_quantity INTEGER NOT NULL,
+            price INTEGER NOT NULL
     )"""
 
     table_3 = """CREATE TABLE IF NOT EXISTS sales (
             id serial PRIMARY KEY NOT NULL,
-            quantity numeric(4) NOT NULL,
-            number_of_items_sold numeric(6) NOT NULL,
-            transaction_amount numeric(6) NOT NULL,
-            date_created TIMESTAMP with time zone DEFAULT('now'::text)::date NOT NULL,
-            user_id INTEGER REFERENCES users(id) NOT NULL,
-            product_id INTEGER REFERENCES products(id) NOT NULL
+            quantity_sold INTEGER NOT NULL,
+            total_price INTEGER NOT NULL,
+            attendant_name TEXT NOT NULL,
+            product_name TEXT NOT NULL
     )"""
 
     # Add all tables to the queries list

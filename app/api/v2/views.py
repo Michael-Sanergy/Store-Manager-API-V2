@@ -128,13 +128,25 @@ class ProductView(Resource):
 
         # create a product if it doesn't exist
         if not product_record:
-            product = ProductModel(
-                data['name'],
-                data['category'],
-                data['quantity'],
-                data['minimum_inventory_quantity'],
-                data['price'])
+            product = ProductModel(data)
 
             # Create the product
             product.create_product()
             return{"message": "Product has been added"}, 201
+
+    @jwt_required
+    def get(self):
+        """Get all products"""
+
+        products_list = []
+
+        products = ProductModel.get_all_products(self)
+
+        # Check if products exist
+        if products is None:
+            return {"message": "No products were found"}, 404
+
+        # Loop through all the products
+        for p in products:
+            products_list.append(ProductModel.get_product_details(self, p))
+        return {"message": "Product(s) Found", "data": products_list}, 200
