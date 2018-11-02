@@ -102,3 +102,15 @@ class ProductModel:
         # Get a single product
         product = curr.fetchone()
         return product
+
+    def get_a_product_by_id(self, id):
+        """Search for a product by id"""
+
+        query = "SELECT * FROM products WHERE id={};".format(id)
+
+        # Execute the query
+        curr.execute(query)
+
+        # Get a single user
+        product = curr.fetchone()
+        return product
