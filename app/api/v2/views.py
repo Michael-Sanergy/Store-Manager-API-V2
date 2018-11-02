@@ -2,6 +2,7 @@ from flask import request
 from flask_restplus import Resource, Namespace, fields
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from .utils import validate_registration, validate_email, validate_product, validate_sale
 
 # Local imports
 from .models import UserModel, ProductModel, SaleModel
@@ -37,7 +38,7 @@ product = namespace_3.model(
 sale = namespace_4.model('Sales', {
     'product_name': fields.Integer(required=True, description="Product Name"),
     'quantity_sold': fields.Integer(required=True, description="Quantity to sell")
-})                            
+})
 
 
 @namespace_1.route('/')
@@ -49,6 +50,12 @@ class Signup(Resource):
         """Sign up a user"""
 
         data = request.get_json(force=True)
+
+        if validate_registration(data):
+            return validate_registration(data)
+
+        if validate_email(data['email']):
+            return {"message": "This email is invalid!"}, 401
 
         # search the user by email
         user_record = UserModel.get_a_user_by_email(data['email'])
@@ -83,6 +90,9 @@ class Login(Resource):
 
         data = request.get_json(force=True)
 
+        if validate_email(data['email']):
+            return {"message": "This email is invalid!"}, 401
+
         # search the user by email
         user_record = UserModel.get_a_user_by_email(data['email'])
 
@@ -109,6 +119,7 @@ class ProductView(Resource):
 
     @jwt_required
     @namespace_3.expect(product)
+    @namespace_3.doc(security='apikey')
     def post(self):
         """Add a product"""
 
@@ -120,9 +131,12 @@ class ProductView(Resource):
 
         # Check if user is an admin
         if role != 'admin':
-            return {"message": "Permission denied! You are not an admin."}, 403
+            return {"message": "Permission denied! You are not an admin."}, 401
 
         data = request.get_json(force=True)
+
+        if validate_product(data):
+            return validate_product(data)
 
         # search the product by id
         product_record = ProductModel.get_a_product_by_name(data['name'])
@@ -142,6 +156,7 @@ class ProductView(Resource):
             return{"message": "Product has been added"}, 201
 
     @jwt_required
+    @namespace_3.doc(security='apikey')
     def get(self):
         """Get all products"""
 
@@ -163,6 +178,7 @@ class ProductView(Resource):
 class Product(Resource):
 
     @jwt_required
+    @namespace_3.doc(security='apikey')
     def get(self, id):
         """Get a product by id"""
 
@@ -179,6 +195,7 @@ class Product(Resource):
         return {"message": "Product Found", "data": products_list}, 200
 
     @jwt_required
+    @namespace_3.doc(security='apikey')
     def put(self, id):
         """Get a product by id to edit"""
 
@@ -190,9 +207,12 @@ class Product(Resource):
 
         # Check if user is an admin
         if role != 'admin':
-            return {"message": "Permission denied! You are not an admin."}, 403
+            return {"message": "Permission denied! You are not an admin."}, 401
 
         data = request.get_json(force=True)
+
+        if validate_product(data):
+            return validate_product(data)
 
         # Edit the product
         new_product = ProductModel(data)
@@ -201,6 +221,7 @@ class Product(Resource):
         return {"message": "Product was updated successfully"}, 200
 
     @jwt_required
+    @namespace_3.doc(security='apikey')
     def delete(self, id):
         """Delete a product by id"""
 
@@ -212,7 +233,7 @@ class Product(Resource):
 
         # Check if user is an admin
         if role != 'admin':
-            return {"message": "Permission denied! You are not an admin."}, 403
+            return {"message": "Permission denied! You are not an admin."}, 401
 
         # search the product by id
         product = ProductModel.get_a_product_by_id(self, id)
@@ -226,8 +247,9 @@ class Product(Resource):
         # Delete Product
         new_product = ProductModel(data)
         new_product.delete_product(id)
-        
+
         return {"message": "Product deleted"}, 200
+
 
 @namespace_4.route('/')
 class SaleView(Resource):
@@ -235,6 +257,7 @@ class SaleView(Resource):
 
     @jwt_required
     @namespace_4.expect(sale)
+    @namespace_4.doc(security='apikey')
     def post(self):
         """Add a sale"""
 
@@ -248,9 +271,12 @@ class SaleView(Resource):
         # Check if user is not an attendant
         if role != 'attendant':
             return {
-                "message": "Permission denied! You are not an attendant."}, 403
+                "message": "Permission denied! You are not an attendant."}, 401
 
         data = request.get_json(force=True)
+
+        if validate_sale(data):
+            return validate_sale(data)
 
         # search the product by name
         product_record = ProductModel.get_a_product_by_name(
@@ -295,6 +321,7 @@ class SaleView(Resource):
         return{"message": "Sale has been created successfully"}, 201
 
     @jwt_required
+    @namespace_4.doc(security='apikey')
     def get(self):
         """Get all sales"""
 
@@ -308,7 +335,7 @@ class SaleView(Resource):
 
         # Check if user is not an admin
         if role != 'admin':
-            return {"message": "Permission denied! You are not an admin."}, 403
+            return {"message": "Permission denied! You are not an admin."}, 401
 
         sales = SaleModel.get_all_sales(self)
 
@@ -321,10 +348,12 @@ class SaleView(Resource):
             sales_list.append(SaleModel.get_sale_details(self, s))
         return {"message": "Sale(s) Found", "data": sales_list}, 200
 
+
 @namespace_4.route('/<int:id>')
 class Sale(Resource):
 
     @jwt_required
+    @namespace_4.doc(security='apikey')
     def get(self, id):
         """Get a sale by id"""
 
