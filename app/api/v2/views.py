@@ -192,3 +192,32 @@ class Product(Resource):
         new_product.edit_product(id)
 
         return {"message": "Product was updated successfully"}, 200
+
+    @jwt_required
+    def delete(self, id):
+        """Delete a product by id"""
+
+        # Get email identity used from the access token
+        user_email = get_jwt_identity()
+        # search the user by email
+        logged_in_user = UserModel.get_a_user_by_email(user_email)
+        role = logged_in_user[4]
+
+        # Check if user is an admin
+        if role != 'admin':
+            return {"message": "Permission denied! You are not an admin."}, 403
+
+        # search the product by id
+        product = ProductModel.get_a_product_by_id(self, id)
+
+        # Check if product doesn't exist
+        if product is None:
+            return {"Message": "Product not found"}, 404
+
+        data = request.get_json(force=True)
+
+        # Delete Product
+        new_product = ProductModel(data)
+        new_product.delete_product(id)
+        
+        return {"message": "Product deleted"}, 200        

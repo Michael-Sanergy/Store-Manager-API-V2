@@ -128,3 +128,14 @@ class ProductModel:
 
         # Commit changes to database
         db.commit()
+
+    def delete_product(self, id):
+        """Delete a product by id"""
+
+        query = "DELETE FROM products WHERE id={};".format(id)
+
+        # Execute the query
+        curr.execute(query)
+
+        # Commit changes to database
+        db.commit()        
