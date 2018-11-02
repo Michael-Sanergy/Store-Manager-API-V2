@@ -155,3 +155,13 @@ class SaleModel:
 
         sales_list = curr.fetchall()
         return sales_list
+
+    def get_sale_details(self, sale):
+        """Return the sale as a dictionary"""
+
+        return dict(
+            id=sale[0],
+            product_name=sale[4],
+            quantity_sold=sale[1],
+            total_price=sale[2],
+            attendant_name=sale[3])        
