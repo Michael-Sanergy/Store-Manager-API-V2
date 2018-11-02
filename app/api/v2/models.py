@@ -79,6 +79,17 @@ class ProductModel:
         products_list = curr.fetchall()
         return products_list
 
+    def get_product_details(self, product):
+        """Return the product as a dictionary"""
+
+        return dict(
+            id=product[0],
+            name=product[1],
+            category=product[2],
+            quantity=product[3],
+            minimum_inventory_quantity=product[4],
+            price=product[5])
+
     @classmethod
     def get_a_product_by_name(cls, name):
         """Search for a product by name"""
