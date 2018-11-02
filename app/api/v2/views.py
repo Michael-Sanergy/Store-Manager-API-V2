@@ -4,7 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 # Local imports
-from .models import UserModel, ProductModel
+from .models import UserModel, ProductModel, SaleModel
 from .database import db, curr
 
 namespace_1 = Namespace("auth/signup", description="End point for signup")
@@ -292,4 +292,31 @@ class SaleView(Resource):
             attendant_name)
         curr.execute(query, payload)
 
-        return{"message": "Sale has been created successfully"}, 201            
+        return{"message": "Sale has been created successfully"}, 201
+
+    @jwt_required
+    def get(self):
+        """Get all sales"""
+
+        sales_list = []
+
+        # Get email identity used from the access token
+        user_email = get_jwt_identity()
+        # search the user by email
+        logged_in_user = UserModel.get_a_user_by_email(user_email)
+        role = logged_in_user[4]
+
+        # Check if user is not an admin
+        if role != 'admin':
+            return {"message": "Permission denied! You are not an admin."}, 403
+
+        sales = SaleModel.get_all_sales(self)
+
+        # Check if sales exist
+        if sales is None:
+            return {"message": "No sales were found"}, 404
+
+        # Loop through all the sales
+        for s in sales:
+            sales_list.append(SaleModel.get_sale_details(self, s))
+        return {"message": "Sale(s) Found", "data": sales_list}, 200
