@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/wakandavibranium/Store-Manager-API-V2.svg?branch=bg-fix-travis-yml-%23161576046)](https://travis-ci.com/wakandavibranium/Store-Manager-API-V2)  [![Coverage Status](https://coveralls.io/repos/github/wakandavibranium/Store-Manager-API-V2/badge.svg?branch=ch-integrate-heroku-%23161433650)](https://coveralls.io/github/wakandavibranium/Store-Manager-API-V2?branch=ch-integrate-heroku-%23161433650)
+[![Build Status](https://travis-ci.com/wakandavibranium/Store-Manager-API-V2.svg?branch=bg-fix-travis-yml-%23161576046)](https://travis-ci.com/wakandavibranium/Store-Manager-API-V2)  [![Coverage Status](https://coveralls.io/repos/github/wakandavibranium/Store-Manager-API-V2/badge.svg?branch=ch-integrate-heroku-%23161433650)](https://coveralls.io/github/wakandavibranium/Store-Manager-API-V2?branch=ch-integrate-heroku-%23161433650)  [![Maintainability](https://api.codeclimate.com/v1/badges/bea1b838773f4effe438/maintainability)](https://codeclimate.com/github/wakandavibranium/Store-Manager-API-V2/maintainability)
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/4394c410e549319bac77)
 
