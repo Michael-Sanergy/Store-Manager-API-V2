@@ -164,4 +164,16 @@ class SaleModel:
             product_name=sale[4],
             quantity_sold=sale[1],
             total_price=sale[2],
-            attendant_name=sale[3])        
+            attendant_name=sale[3])
+
+    def get_a_sale_by_id(self, id):
+        """Search for a sale by id"""
+
+        query = "SELECT * FROM sales WHERE id={};".format(id)
+
+        # Execute the query
+        curr.execute(query)
+
+        # Get a single sale
+        sale = curr.fetchone()
+        return sale                    
