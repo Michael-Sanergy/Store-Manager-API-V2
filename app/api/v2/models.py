@@ -138,4 +138,20 @@ class ProductModel:
         curr.execute(query)
 
         # Commit changes to database
-        db.commit()        
+        db.commit()
+
+class SaleModel:
+    """Model for sales"""
+
+    sales_list = []
+
+    def get_all_sales(self):
+        """Get all sales"""
+
+        query = "SELECT * FROM sales"
+
+        # Execute the query
+        curr.execute(query)
+
+        sales_list = curr.fetchall()
+        return sales_list
