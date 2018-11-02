@@ -5,10 +5,12 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 
 # Local imports
 from .models import UserModel, ProductModel
+from .database import db, curr
 
 namespace_1 = Namespace("auth/signup", description="End point for signup")
 namespace_2 = Namespace("auth/login", description="End point for login")
 namespace_3 = Namespace("products", description="End points for products")
+namespace_4 = Namespace("sales", description="End points for sales")
 
 user = namespace_1.model('User Registration', {
     'name': fields.String(required=True, description="Your name"),
@@ -31,6 +33,11 @@ product = namespace_3.model(
                     required=True, description="Quantity"), "minimum_inventory_quantity": fields.Integer(
                         required=True, description="Mininum Inventory Quantity"), "price": fields.Integer(
                             required=True, description="Price")})
+
+sale = namespace_4.model('Sales', {
+    'product_name': fields.Integer(required=True, description="Product Name"),
+    'quantity_sold': fields.Integer(required=True, description="Quantity to sell")
+})                            
 
 
 @namespace_1.route('/')
@@ -220,4 +227,69 @@ class Product(Resource):
         new_product = ProductModel(data)
         new_product.delete_product(id)
         
-        return {"message": "Product deleted"}, 200        
+        return {"message": "Product deleted"}, 200
+
+@namespace_4.route('/')
+class SaleView(Resource):
+    """Sales resource"""
+
+    @jwt_required
+    @namespace_4.expect(sale)
+    def post(self):
+        """Add a sale"""
+
+        # Get email identity used from the access token
+        user_email = get_jwt_identity()
+        # search the user by email
+        logged_in_user = UserModel.get_a_user_by_email(user_email)
+        role = logged_in_user[4]
+        attendant_name = logged_in_user[1]
+
+        # Check if user is not an attendant
+        if role != 'attendant':
+            return {
+                "message": "Permission denied! You are not an attendant."}, 403
+
+        data = request.get_json(force=True)
+
+        # search the product by name
+        product_record = ProductModel.get_a_product_by_name(
+            data['product_name'])
+
+        # check if product doesn't exist
+        if not product_record:
+            return {
+                "message": "Product {} doesn't exists.".format(
+                    data['product_name'])}, 404
+
+        product_quantity = product_record[3]
+        minimum_inventory_quantity = product_record[4]
+        product_price = product_record[5]
+
+        if data['quantity_sold'] > product_quantity:
+            return {
+                "message": "You can't sell more {} than we have in stock".format(
+                    data['product_name'])}, 400
+
+        if product_quantity == minimum_inventory_quantity:
+            return {
+                "message": "You have reached the minimum stock limit of {} . Please restock item {}".format(
+                    minimum_inventory_quantity, data['product_name'])}, 200
+
+        product_quantity = product_quantity - data['quantity_sold']
+        curr.execute(
+            """ UPDATE products SET quantity= %s WHERE name =%s""",
+            (product_quantity,
+             data['product_name']))
+        db.commit()
+
+        total_price = product_price * data['quantity_sold']
+        query = "INSERT INTO sales(product_name, quantity_sold, total_price,attendant_name) VALUES( %s, %s, %s, %s)"
+        payload = (
+            data['product_name'],
+            data['quantity_sold'],
+            total_price,
+            attendant_name)
+        curr.execute(query, payload)
+
+        return{"message": "Sale has been created successfully"}, 201            
