@@ -22,7 +22,7 @@ class UserTestCase(unittest.TestCase):
         self.admin_user = {
             "name": "John Doe",
             "email": "johndoe@gmail.com",
-            "phone": "7262123",
+            "phone": 7262123,
             "role": "admin",
             "password": "12345"}
 
@@ -35,7 +35,7 @@ class UserTestCase(unittest.TestCase):
             'category': 'Snacks',
             'quantity': 150,
             "minimum_inventory_quantity": 5,
-            'price': 20}
+            'price': 20} 
 
         # Sign up admin user
         response = self.client.post(

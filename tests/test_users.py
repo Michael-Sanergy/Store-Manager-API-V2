@@ -22,7 +22,7 @@ class UserTestCase(unittest.TestCase):
         self.users = {
             "name": "John Doe",
             "email": "johndoe@gmail.com",
-            "phone": "722123456",
+            "phone": 2123456,
             "role": "admin",
             "password": "12345"}
 
