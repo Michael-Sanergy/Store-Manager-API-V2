@@ -170,3 +170,25 @@ class Product(Resource):
 
         products_list.append(ProductModel.get_product_details(self, product))
         return {"message": "Product Found", "data": products_list}, 200
+
+    @jwt_required
+    def put(self, id):
+        """Get a product by id to edit"""
+
+        # Get email identity used from the access token
+        user_email = get_jwt_identity()
+        # search the user by email
+        logged_in_user = UserModel.get_a_user_by_email(user_email)
+        role = logged_in_user[4]
+
+        # Check if user is an admin
+        if role != 'admin':
+            return {"message": "Permission denied! You are not an admin."}, 403
+
+        data = request.get_json(force=True)
+
+        # Edit the product
+        new_product = ProductModel(data)
+        new_product.edit_product(id)
+
+        return {"message": "Product was updated successfully"}, 200
