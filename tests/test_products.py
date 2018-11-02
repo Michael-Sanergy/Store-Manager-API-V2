@@ -35,7 +35,7 @@ class UserTestCase(unittest.TestCase):
             'category': 'Snacks',
             'quantity': 150,
             "minimum_inventory_quantity": 5,
-            'price': 20}
+            'price': 20} 
 
         # Sign up admin user
         response = self.client.post(
