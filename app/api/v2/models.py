@@ -114,3 +114,17 @@ class ProductModel:
         # Get a single user
         product = curr.fetchone()
         return product
+
+    def edit_product(self, product_id):
+        """Edit a product"""
+
+        curr.execute(
+            """UPDATE products SET name = %s, category = %s,quantity=%s,
+                minimum_inventory_quantity = %s, price = %s
+                WHERE id = %s""", (self.name, self.category, self.quantity,
+                                   self.minimum_inventory_quantity, self.price,
+                                   product_id),
+        )
+
+        # Commit changes to database
+        db.commit()
