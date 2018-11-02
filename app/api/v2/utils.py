@@ -1,6 +1,13 @@
 import json
 import re
 
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'X-API-KEY'
+    }
+}
 
 def validate_registration(data):
     """Validate registration of user"""
