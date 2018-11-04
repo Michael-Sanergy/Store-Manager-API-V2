@@ -20,14 +20,14 @@ class UserTestCase(unittest.TestCase):
         create_tables()
 
         self.users = {
-            "name": "John Doe",
-            "email": "johndoe@gmail.com",
-            "phone": 2123456,
+            "name": "Jane Doe",
+            "email": "janedoe@gmail.com",
+            "phone": 271234,
             "role": "admin",
             "password": "12345"}
 
         self.user_login = {
-            "email": "johndoe@gmail.com",
+            "email": "janedoe@gmail.com",
             "password": "12345"}
 
     def tearDown(self):
@@ -69,7 +69,7 @@ class UserTestCase(unittest.TestCase):
             content_type=self.content_type)
         data = json.loads(response2.get_data().decode('UTF-8'))
         self.assertEqual(response2.status_code, 202)
-        self.assertEqual(data, {"message": "User John Doe already exists."})
+        self.assertEqual(data, {"message": "User Jane Doe already exists."})
 
     def test_registered_user_can_login_with_valid_credentials(self):
         """Test user can login with valid credentials"""
@@ -86,14 +86,14 @@ class UserTestCase(unittest.TestCase):
                 self.user_login),
             content_type=self.content_type)
         data = json.loads(response.get_data().decode('UTF-8'))
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(data["message"], "Login Successful")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["message"], "Logged in as Jane Doe")
 
     def test_registered_user_cant_login_with_wrong_password(self):
         """Test user can't login with wrong password"""
 
         payload = {
-            "email": "johndoe@gmail.com",
+            "email": "janedoe@gmail.com",
             "password": "123xyz"}
 
         response = self.client.post(

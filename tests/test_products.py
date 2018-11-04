@@ -35,7 +35,7 @@ class UserTestCase(unittest.TestCase):
             'category': 'Snacks',
             'quantity': 150,
             "minimum_inventory_quantity": 5,
-            'price': 20} 
+            'price': 20}
 
         # Sign up admin user
         response = self.client.post(
@@ -52,9 +52,8 @@ class UserTestCase(unittest.TestCase):
             headers=self.header_content)
         result = json.loads(response.data.decode())
         # Get access token
-        token = result['access_token']
-        self.authorize_user = {"content_type": "application/json"}
-        self.authorize_user["Authorization"] = 'Bearer ' + token
+        token = result['Authorization']
+        self.authorize_user = {"Authorization": token}
 
     def tearDown(self):
         """Empty the product dictionary after running every test"""
