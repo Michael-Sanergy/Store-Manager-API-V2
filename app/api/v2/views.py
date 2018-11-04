@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, jsonify
 from flask_restplus import Resource, Namespace, fields
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -36,7 +36,7 @@ product = namespace_3.model(
                             required=True, description="Price")})
 
 sale = namespace_4.model('Sales', {
-    'product_name': fields.Integer(required=True, description="Product Name"),
+    'product_name': fields.String(required=True, description="Product Name"),
     'quantity_sold': fields.Integer(required=True, description="Quantity to sell")
 })
 
@@ -105,9 +105,12 @@ class Login(Resource):
             if user_record[2] == data['email'] and validate_password:
                 # Create access token
                 access_token = create_access_token(identity=data['email'])
-
-                return {"message": "Login Successful",
-                        "access_token": access_token}, 201
+                response_message = {
+                    "message": "Logged in as {}".format(
+                        user_record[1]),
+                    "Authorization": "Bearer " +
+                    access_token}
+                return response_message, 200
             return {"message": "Login Failed!"}, 401
         elif not user_record:
             return {"message": "You are not registered!. Please register"}, 403

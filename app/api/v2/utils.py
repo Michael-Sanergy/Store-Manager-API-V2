@@ -5,9 +5,10 @@ authorizations = {
     'apikey': {
         'type': 'apiKey',
         'in': 'header',
-        'name': 'X-API-KEY'
+        'name': 'Authorization'
     }
 }
+
 
 def validate_registration(data):
     """Validate registration of user"""
